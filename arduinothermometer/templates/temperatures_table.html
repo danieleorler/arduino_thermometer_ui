@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+
+{% block title %}Temperatures of the Day{% endblock %}
+
+{% block extrajs %}
+    <script type='text/javascript' src='http://www.google.com/jsapi'></script>
+    <script type='text/javascript'>
+
+        var temp_data = 
+        [
+            {% for plot in plots %}
+                [{{ plot.x }}, {{ plot.y }}],
+            {% endfor %}
+        ];
+
+        if(getDeviceMode() == 'desktop')
+        {
+            drawDesktopChart(document.getElementById('chart_div'),temp_data);
+        }
+        else
+        {
+            drawMobileChart(document.getElementById('chart_div'),temp_data);
+        }
+        
+    </script>
+{% endblock %}
+
+{% block content %}
+
+    <p>
+        <a href="/temperature/in" class="btn" type="button">Sensor IN</a>
+        <a href="/temperature/out" class="btn" type="button">Sensor OUT</a>
+    </p>
+
+    <div id='chart_div' style='width: 900px; height: 400px;'></div>
+
+    <div id="last_measure">
+        <h3>Last Measure</h3>
+            <dl>
+                <dt>Date</dt>
+                <dd>{{ last.date }}</dd>
+                <dt>Temperature</dt>
+                <dd>{{ last.temperature }}</dd>
+            </dl>
+    </div>
+
+    <table class="table">
+
+        <thead>
+            <tr>
+                <th>sensor</th>
+                <th>date</th>
+                <th>temperature</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for measure in data %}
+                <tr>
+                    <td>{{ measure.sensor }}</td>
+                    <td>{{ measure.date }}</td>
+                    <td>{{ measure.temperature }}</td>
+                </tr>
+            
+            {% endfor %}
+        </tbody>
+
+    </table>
+{% endblock %}
