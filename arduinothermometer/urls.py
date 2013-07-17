@@ -7,7 +7,7 @@ from django.conf.urls import patterns, include, url
 urlpatterns = patterns('',
                        url(r'^temperature/$', 'temperature.views.index'),
                        url(r'^temperature/(?P<sensor>\w+)/$', 'temperature.views.index'),
-                       url(r'^stats/(?P<sensor>\w+)/$', 'temperature.views.stats')
+                       url(r'^stats/(?P<sensor>\w+)/(?P<type>\w+)/$', 'temperature.views.stats')
     # Examples:
     # url(r'^$', 'arduinothermometer.views.home', name='home'),
     # url(r'^arduinothermometer/', include('arduinothermometer.foo.urls')),

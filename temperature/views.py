@@ -1,25 +1,28 @@
 from django.http import HttpResponse
 from django.template import Context, loader
-import json, math, time
+import math, time
 from django.conf import settings
 from datetime import datetime,date,timedelta
 from time import mktime
 from models import Statistic
 from google.appengine.ext import db
-from temperature.helpers import makeRequest
+from temperature.DataFetcher import DataFetcher
+from temperature.StatisticManager import StatisticManager
+import logging
 
 def index(request, sensor = "out"):
 
     ts_to = int(time.time())*1000;
-    ts_from = ts_to - 7*24*60*60*1000;    
-    result = makeRequest(sensor,ts_from,ts_to)
+    ts_from = ts_to - 7*24*60*60*1000;
+    
+    dataFetcher = DataFetcher()
+    dataFetcher.compileUrl("viabasse",sensor,ts_from,ts_to)
 
     plots = []
 
-    if result.status_code == 200:
+    if dataFetcher.call() == 1 and dataFetcher.getStatusCode() == 200:
         
-        json_data = result.content
-        data = json.loads(json_data)
+        data = dataFetcher.getJson()
 
         template = loader.get_template('temperatures_table.html')
 
@@ -38,46 +41,23 @@ def index(request, sensor = "out"):
 
     return HttpResponse("Error")
 
-def stats(request, sensor):
+def stats(request, sensor, type):
 
-    yesterday = date.today()-timedelta(1)
-    tmp_ts_from = int(mktime(yesterday.timetuple()))
-    print tmp_ts_from
-    tmp_ts_to = tmp_ts_from + 24*60*60
-    ts_from = tmp_ts_from * 1000
-    ts_to = tmp_ts_to * 1000
+    sm = StatisticManager()
+    indicators = None
 
-    result = makeRequest(
-        sensor,
-        ts_from,
-        ts_to
-        )
+    if(type == "daily"):
+        indicators = sm.getYesterdaysIndicators(sensor)
 
-    if result.status_code == 200:
+    if(indicators != None):
 
-        data = json.loads(result.content)
+        db.put(indicators["min"])
+        db.put(indicators["max"])
+        db.put(indicators["avg"])
 
-        min_value = Statistic(day=datetime.fromtimestamp(tmp_ts_from).date(),k="min_temp",v=10000.0,sensor=sensor)
-        max_value = Statistic(day=datetime.fromtimestamp(tmp_ts_from).date(),k="max_temp",v=-10000.0,sensor=sensor)
-        sum_value = 0
-        count_value = 0
+        logging.info("{} indicators -> min: {}, max: {}, avg: {}".format(type,indicators["min"].v,indicators["max"].v,indicators["avg"].v))
 
-        for line in data:
+    else:
+        print logging.info("Nothing to compute")
 
-            if line["temperature"] < min_value.v:
-                min_value.v = float(line["temperature"])
-                min_value.when = datetime.fromtimestamp((int(line["timestamp"])/1000)+settings.TMZDIFF)
-            if line["temperature"] > max_value.v:
-                max_value.v = float(line["temperature"])
-                max_value.when = datetime.fromtimestamp((int(line["timestamp"])/1000)+settings.TMZDIFF)
-            
-            sum_value = sum_value + line["temperature"]
-            count_value = count_value + 1
-
-        avg_value = Statistic(day=datetime.fromtimestamp(tmp_ts_from).date(),k="avg_temp",v=round(sum_value/count_value,2),sensor=sensor)
-
-    db.put(min_value)
-    db.put(max_value)
-    db.put(avg_value)
-
-    return HttpResponse("min: {}, max: {}, avg: {}".format(min_value.v,max_value.v,avg_value.v))
+    return HttpResponse('OK', status=200)
