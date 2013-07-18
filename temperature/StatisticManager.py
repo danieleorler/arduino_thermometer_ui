@@ -29,8 +29,8 @@ class StatisticManager:
 
 			data = self.__dataFetcher.getJson()
 
-			min_value = Statistic(day=self.__today,k="min_temp",v=10000.0,sensor=sensor,type="daily")
-			max_value = Statistic(day=self.__today,k="max_temp",v=-10000.0,sensor=sensor,type="daily")
+			min_value = Statistic(day=yesterday,k="min_temp",v=10000.0,sensor=sensor,type="daily")
+			max_value = Statistic(day=yesterday,k="max_temp",v=-10000.0,sensor=sensor,type="daily")
 			sum_value = 0
 			count_value = 0
 
@@ -46,7 +46,7 @@ class StatisticManager:
 				sum_value = sum_value + line["temperature"]
 				count_value = count_value + 1
 
-			avg_value = Statistic(day=self.__today,k="avg_temp",v=round(sum_value/count_value,2),sensor=sensor,type="daily")
+			avg_value = Statistic(day=yesterday,k="avg_temp",v=round(sum_value/count_value,2),sensor=sensor,type="daily")
 
 			return {'min':min_value,'max':max_value,'avg':avg_value}
 		else:
