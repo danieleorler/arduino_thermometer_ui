@@ -6,20 +6,27 @@
     <script type='text/javascript' src='http://www.google.com/jsapi'></script>
     <script type='text/javascript'>
 
-        var temp_data = 
-        [
-            {% for plot in plots %}
-                [{{ plot.x }}, {{ plot.y }}],
-            {% endfor %}
-        ];
+        var data = {};
+        data.dateType = 'date';
+        data.dateName = 'Date';
+        data.valType = 'number';
+        data.valName = 'Temperature';
+        data.series = [];
+        data.series.push( 
+          [
+                {% for plot in plots %}
+                    [{{ plot.x }}, {{ plot.y }}],
+                {% endfor %}
+          ]
+        );
 
         if(getDeviceMode() == 'desktop')
         {
-            drawDesktopChart(document.getElementById('chart_div'),temp_data);
+            drawDesktopChart(document.getElementById('chart_div'),data);
         }
         else
         {
-            drawMobileChart(document.getElementById('chart_div'),temp_data);
+            drawMobileChart(document.getElementById('chart_div'),data);
         }
         
     </script>
@@ -30,6 +37,8 @@
     <p>
         <a href="/temperature/in" class="btn" type="button">Sensor IN</a>
         <a href="/temperature/out" class="btn" type="button">Sensor OUT</a>
+        <a href="/indicators/out/daily" class="btn" type="button">Indicators Sensor OUT</a>
+        <a href="/indicators/in/daily" class="btn" type="button">Indicators Sensor IN</a>
     </p>
 
     <div id='chart_div' style='width: 900px; height: 400px;'></div>

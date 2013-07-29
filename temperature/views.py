@@ -54,10 +54,54 @@ def stats(request, sensor, type):
         db.put(indicators["min"])
         db.put(indicators["max"])
         db.put(indicators["avg"])
+        db.put(indicators["range"])
 
-        logging.info("{} indicators -> min: {}, max: {}, avg: {}".format(type,indicators["min"].v,indicators["max"].v,indicators["avg"].v))
+        logging.info("{} indicators -> min: {}, max: {}, avg: {}, range: {}".format(type,indicators["min"].v,indicators["max"].v,indicators["avg"].v,indicators["range"].v))
 
     else:
         print logging.info("Nothing to compute")
 
     return HttpResponse('OK', status=200)
+
+def manualStats(request, sensor, type, date):
+
+    day = datetime.strptime(date, '%Y-%m-%d').date()
+    sm = StatisticManager()
+    sm.setToday(day)
+
+    indicators = None
+
+    if(type == "daily"):
+        indicators = sm.getYesterdaysIndicators(sensor)
+
+    if(indicators != None):
+
+        db.put(indicators["min"])
+        db.put(indicators["max"])
+        db.put(indicators["avg"])
+        db.put(indicators["range"])
+
+        logging.info("{} indicators -> min: {}, max: {}, avg: {}, range: {}".format(type,indicators["min"].v,indicators["max"].v,indicators["avg"].v,indicators["range"].v))
+
+    else:
+        print logging.info("Nothing to compute")
+
+    return HttpResponse('OK', status=200)
+
+def indicators(request, sensor, type):
+
+    indicators = dict()
+
+    q = db.Query(Statistic)
+    q.filter('day >', date.today()-timedelta(60)).filter('sensor = ',sensor).order('day')
+    
+    for stat in q.run():
+        if(not stat.day in indicators):
+            indicators[stat.day] = {"day":"new Date({}, {}, {})".format(stat.day.year,stat.day.month-1,stat.day.day)}
+
+        indicators[stat.day][stat.k] = stat.v
+
+
+    context = Context({ 'table': indicators })
+    template = loader.get_template('indicators_chart.html')
+    return HttpResponse(template.render(context))

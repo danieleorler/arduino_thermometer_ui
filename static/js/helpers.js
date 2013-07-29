@@ -17,38 +17,76 @@ function getDeviceMode()
     }
 }
 
-function drawDesktopChart(element,temp_data)
+function drawDesktopChart(element,data)
 {
     google.load('visualization', '1', {'packages':['annotatedtimeline']});
 
     function drawChart()
     {
-        var data = new google.visualization.DataTable();
-        data.addColumn('datetime', 'Date');
-        data.addColumn('number', 'Temperature');
-        data.addRows(temp_data);
+        var graphData = new google.visualization.DataTable();
+        graphData.addColumn(data.dateType, data.dateName);
+        graphData.addColumn(data.valType, data.valName);
+        
+        for(i in data.series)
+        {
+            graphData.addRows(data.series[i]);
+        }
 
         var chart = new google.visualization.AnnotatedTimeLine(element);
-        chart.draw(data, {displayAnnotations: true});
+        chart.draw(graphData, {displayAnnotations: true});
     }
 
     google.setOnLoadCallback(drawChart);
 }
 
-function drawMobileChart(element,temp_data)
+function drawMobileChart(element,data)
 {
 
     google.load('visualization', '1.0', {'packages':['corechart']});
 
     function drawChart()
     {
-        var data = new google.visualization.DataTable();
-        data.addColumn('datetime', 'Date');
-        data.addColumn('number', 'Temperature');
-        data.addRows(temp_data);
+        var graphData = new google.visualization.DataTable();
+        graphData.addColumn(data.dateType, data.dateName);
+        graphData.addColumn(data.valType, data.valName);
+        
+        for(i in data.series)
+        {
+            graphData.addRows(data.series[i]);
+        }
 
         var chart = new google.visualization.LineChart(element);
-        chart.draw(data, {curveType: "function"});
+        chart.draw(graphData, {curveType: "function"});
+    }
+
+    google.setOnLoadCallback(drawChart);
+
+}
+
+function drawIndicatorsChart(element,data)
+{
+
+    google.load('visualization', '1.0', {'packages':['corechart']});
+
+    function drawChart()
+    {
+        var graphData = new google.visualization.DataTable();
+        graphData.addColumn("date","Date");
+        graphData.addColumn("number","Min");
+        graphData.addColumn("number","Max");
+        graphData.addColumn("number","Avg");
+        graphData.addRows(data);
+        graphData.sort([{column:0}]);
+        
+        var options =
+        {
+            title: 'Min, Max and Avg Temperature',
+            curveType: "function"
+        };
+
+
+        var chart = new google.visualization.LineChart(element);
+        chart.draw(graphData, options);
     }
 
     google.setOnLoadCallback(drawChart);

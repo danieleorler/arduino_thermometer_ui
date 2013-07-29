@@ -5,9 +5,12 @@ from django.conf.urls import patterns, include, url
 # admin.autodiscover()
 
 urlpatterns = patterns('',
+                       url(r'^$', 'temperature.views.index'),
                        url(r'^temperature/$', 'temperature.views.index'),
                        url(r'^temperature/(?P<sensor>\w+)/$', 'temperature.views.index'),
-                       url(r'^stats/(?P<sensor>\w+)/(?P<type>\w+)/$', 'temperature.views.stats')
+                       url(r'^stats/(?P<sensor>\w+)/(?P<type>\w+)/$', 'temperature.views.stats'),
+                       url(r'^stats/(?P<sensor>\w+)/(?P<type>\w+)/(?P<date>\d{4}-\d{2}-\d{2})/$', 'temperature.views.manualStats'),
+                       url(r'^indicators/(?P<sensor>\w+)/(?P<type>\w+)/$', 'temperature.views.indicators'),
     # Examples:
     # url(r'^$', 'arduinothermometer.views.home', name='home'),
     # url(r'^arduinothermometer/', include('arduinothermometer.foo.urls')),

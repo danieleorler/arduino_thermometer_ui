@@ -10,6 +10,7 @@ class DataFetcher:
 		self.__statusCode = -1
 		self.__content = None
 		self.__contentJson = None
+		urlfetch.set_default_fetch_deadline(10)
 
 	def compileUrl(self,device,sensor,ts_from,ts_to):
 		self.__url = self.__urlPattern.format(device,sensor,ts_from,ts_to)

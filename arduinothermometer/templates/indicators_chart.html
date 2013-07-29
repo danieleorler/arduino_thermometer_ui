@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block title %}Indicators Chart{% endblock %}
+
+{% block extrajs %}
+<script type='text/javascript' src='http://www.google.com/jsapi'></script>
+<script type='text/javascript'>
+
+	var data =
+	[
+		{% for key,row in table.items %}
+		    [{{ row.day }}, {{ row.min_temp }}, {{ row.max_temp }}, {{ row.avg_temp }}],
+		{% endfor %}
+	];
+
+	drawIndicatorsChart(document.getElementById('chart_div'),data);
+
+
+</script>
+{% endblock %}
+
+{% block content %}
+    <div id='chart_div' style='width: 900px; height: 400px;'></div>
+{% endblock %}

@@ -20,8 +20,8 @@ class StatisticManager:
 		yesterday = self.__today-timedelta(1)
 		tmp_ts_from = int(mktime(yesterday.timetuple()))
 		tmp_ts_to = tmp_ts_from + 24*60*60
-		ts_from = tmp_ts_from * 1000
-		ts_to = tmp_ts_to * 1000
+		ts_from = tmp_ts_from * 1000 + settings.TMZDIFF
+		ts_to = tmp_ts_to * 1000 + settings.TMZDIFF
 
 		self.__dataFetcher.compileUrl("viabasse",sensor,ts_from,ts_to)
 
@@ -38,16 +38,16 @@ class StatisticManager:
 
 				if line["temperature"] < min_value.v:
 					min_value.v = float(line["temperature"])
-					min_value.when = datetime.fromtimestamp((int(line["timestamp"])/1000)+settings.TMZDIFF)
+					min_value.when = datetime.fromtimestamp((int(line["timestamp"])/1000))
 				if line["temperature"] > max_value.v:
 					max_value.v = float(line["temperature"])
-					max_value.when = datetime.fromtimestamp((int(line["timestamp"])/1000)+settings.TMZDIFF)
+					max_value.when = datetime.fromtimestamp((int(line["timestamp"])/1000))
 
 				sum_value = sum_value + line["temperature"]
 				count_value = count_value + 1
 
 			avg_value = Statistic(day=yesterday,k="avg_temp",v=round(sum_value/count_value,2),sensor=sensor,type="daily")
-
-			return {'min':min_value,'max':max_value,'avg':avg_value}
+			range_value = Statistic(day=yesterday,k="range_temp",v=max_value.v-min_value.v,sensor=sensor,type="daily")
+			return {'min':min_value,'max':max_value,'avg':avg_value,'range':range_value}
 		else:
 			return None
