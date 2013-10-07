@@ -7,10 +7,18 @@
     <script type='text/javascript'>
 
         var data = {};
-        data.dateType = 'date';
+        data.dateType = 'datetime';
         data.dateName = 'Date';
         data.valType = 'number';
-        data.valName = 'Temperature';
+        data.valName = 'Temp';
+        if($.inArray(getDeviceMode(), ['xs','sm','md']))
+        {
+            data.height = "200px";
+        }
+        else
+        {
+            data.height = "400px";
+        }
         data.series = [];
         data.series.push( 
           [
@@ -20,60 +28,63 @@
           ]
         );
 
-        if(getDeviceMode() == 'desktop')
-        {
-            drawDesktopChart(document.getElementById('chart_div'),data);
-        }
-        else
-        {
-            drawMobileChart(document.getElementById('chart_div'),data);
-        }
-        
+        drawMobileChart(document.getElementById('chart_div'),data);
+
     </script>
+
 {% endblock %}
 
 {% block content %}
 
-    <p>
-        <a href="/temperature/in" class="btn" type="button">Sensor IN</a>
-        <a href="/temperature/out" class="btn" type="button">Sensor OUT</a>
-        <a href="/indicators/out/daily" class="btn" type="button">Indicators Sensor OUT</a>
-        <a href="/indicators/in/daily" class="btn" type="button">Indicators Sensor IN</a>
-    </p>
-
-    <div id='chart_div' style='width: 900px; height: 400px;'></div>
-
-    <div id="last_measure">
-        <h3>Last Measure</h3>
-            <dl>
-                <dt>Date</dt>
-                <dd>{{ last.date }}</dd>
-                <dt>Temperature</dt>
-                <dd>{{ last.temperature }}</dd>
-            </dl>
+    <div class="row" id="last_measure">
+        <div class="col-md-4"></div>
+        <div id='chart_div' class="col-md-4" style='width: 100%; height: 400px;'></div>
+        <div class="col-md-4"></div>
     </div>
 
-    <table class="table">
+    <div class="row" id="last_measure">
 
-        <thead>
-            <tr>
-                <th>sensor</th>
-                <th>date</th>
-                <th>temperature</th>
-            </tr>
-        </thead>
+        <div class="col-md-4"></div>
+        <div class="col-md-4 alert alert-info">
+            Last Measure at <b>{{ last.date }}</b>, temperature <b>{{ last.temperature }}</b>&deg; C
+        </div>
+        <div class="col-md-4"></div>
 
-        <tbody>
+    </div>
 
-            {% for measure in data %}
-                <tr>
-                    <td>{{ measure.sensor }}</td>
-                    <td>{{ measure.date }}</td>
-                    <td>{{ measure.temperature }}</td>
-                </tr>
-            
-            {% endfor %}
-        </tbody>
+    <div class="row">
 
-    </table>
+        <div class="col-md-2"></div>
+
+        <div class="col-md-8">
+            <div class="table-responsive">
+                <table class="table table-hover">
+
+                    <thead>
+                        <tr>
+                            <th>sensor</th>
+                            <th>date</th>
+                            <th>temperature</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for measure in data %}
+                            <tr>
+                                <td>{{ measure.sensor }}</td>
+                                <td>{{ measure.date }}</td>
+                                <td>{{ measure.temperature }}</td>
+                            </tr>
+                        
+                        {% endfor %}
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+
+        <div class="col-md-2"></div>
+
+    </div>
 {% endblock %}

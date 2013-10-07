@@ -47,7 +47,10 @@ def stats(request, sensor, type):
     indicators = None
 
     if(type == "daily"):
-        indicators = sm.getYesterdaysIndicators(sensor)
+        indicators = sm.getLastDayIndicators(sensor)
+        
+    if(type == "monthly"):
+        indicators = sm.getLastMonthIndicators(sensor)
 
     if(indicators != None):
 
@@ -72,7 +75,10 @@ def manualStats(request, sensor, type, date):
     indicators = None
 
     if(type == "daily"):
-        indicators = sm.getYesterdaysIndicators(sensor)
+        indicators = sm.getLastDayIndicators(sensor)
+
+    if(type == "monthly"):
+        indicators = sm.getLastMonthIndicators(sensor)
 
     if(indicators != None):
 
@@ -93,7 +99,12 @@ def indicators(request, sensor, type):
     indicators = dict()
 
     q = db.Query(Statistic)
-    q.filter('day >', date.today()-timedelta(60)).filter('sensor = ',sensor).order('day')
+
+    if(type == "daily"):
+        q.filter('day >', date.today()-timedelta(90)).filter('sensor = ',sensor).filter('type = ',type).order('day')
+
+    if(type == "monthly"):
+        q.filter('sensor = ',sensor).filter('type = ',type).order('day')
     
     for stat in q.run():
         if(not stat.day in indicators):

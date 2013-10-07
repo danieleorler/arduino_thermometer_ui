@@ -1,6 +1,6 @@
 function getDeviceMode()
 {
-    var envs = ['phone', 'tablet', 'desktop'];
+    var envs = ['xs', 'sm', 'md', 'lg'];
 
     $el = $('<div>');
     $el.appendTo($('body'));
@@ -33,7 +33,7 @@ function drawDesktopChart(element,data)
         }
 
         var chart = new google.visualization.AnnotatedTimeLine(element);
-        chart.draw(graphData, {displayAnnotations: true});
+        chart.draw(graphData, {displayAnnotations: true, height:data.height});
     }
 
     google.setOnLoadCallback(drawChart);
@@ -56,7 +56,7 @@ function drawMobileChart(element,data)
         }
 
         var chart = new google.visualization.LineChart(element);
-        chart.draw(graphData, {curveType: "function"});
+        chart.draw(graphData, {curveType: "function",height:data.height});
     }
 
     google.setOnLoadCallback(drawChart);
@@ -77,16 +77,24 @@ function drawIndicatorsChart(element,data)
         graphData.addColumn("number","Avg");
         graphData.addRows(data);
         graphData.sort([{column:0}]);
+
+        var dataView = new google.visualization.DataView(graphData);
+        dataView.setColumns(
+            [
+                {calc: function(data, row) { return data.getFormattedValue(row, 0); }, type:'string'},
+                1,
+                2,
+                3
+            ]);
         
         var options =
         {
-            title: 'Min, Max and Avg Temperature',
-            curveType: "function"
+            title: 'Min, Max and Avg Temperature'
         };
 
 
         var chart = new google.visualization.LineChart(element);
-        chart.draw(graphData, options);
+        chart.draw(dataView, options);
     }
 
     google.setOnLoadCallback(drawChart);

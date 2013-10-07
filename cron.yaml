@@ -1,7 +1,13 @@
 cron:
-- description: min max and avg computation for outside temp
+- description: daily min max and avg computation for outside temp
   url: /stats/out/daily/
   schedule: every day 05:00
-- description: min max and avg computation for inside temp
+- description: daily min max and avg computation for inside temp
   url: /stats/in/daily/
   schedule: every day 05:01
+- description: monthly min max and avg computation for inside temp
+  url: /stats/in/monthly/
+  schedule: 1 of month 05:02
+- description: monthly min max and avg computation for outside temp
+  url: /stats/out/monthly/
+  schedule: 1 of month 05:03
