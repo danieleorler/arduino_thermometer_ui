@@ -18,6 +18,13 @@ indexes:
 
 - kind: Statistic
   properties:
+  - name: k
+  - name: sensor
+  - name: type
+  - name: day
+
+- kind: Statistic
+  properties:
   - name: sensor
   - name: day
 

@@ -8,3 +8,7 @@ class Statistic(db.Model):
 	when = db.DateTimeProperty()
 	sensor = db.StringProperty()
 	type = db.StringProperty(required=True, choices=set(["daily", "monthly", "yearly"]))
+
+class Setting(db.Model):
+    k = db.StringProperty()
+    v = db.StringProperty()

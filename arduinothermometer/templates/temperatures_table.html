@@ -11,14 +11,8 @@
         data.dateName = 'Date';
         data.valType = 'number';
         data.valName = 'Temp';
-        if($.inArray(getDeviceMode(), ['xs','sm','md']))
-        {
-            data.height = "200px";
-        }
-        else
-        {
-            data.height = "400px";
-        }
+        data.height = CHART_HEIGHT[getDeviceMode()];
+
         data.series = [];
         data.series.push( 
           [
@@ -38,7 +32,7 @@
 
     <div class="row" id="last_measure">
         <div class="col-md-4"></div>
-        <div id='chart_div' class="col-md-4" style='width: 100%; height: 400px;'></div>
+        <div id='chart_div' class="col-md-4" style='width: 100%;'>loading graph...</div>
         <div class="col-md-4"></div>
     </div>
 

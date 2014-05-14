@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from django.http import HttpResponse
 from django.template import Context, loader
 import math, time
@@ -5,9 +7,11 @@ from django.conf import settings
 from datetime import datetime,date,timedelta
 from time import mktime
 from models import Statistic
+from models import Setting
 from google.appengine.ext import db
 from temperature.DataFetcher import DataFetcher
 from temperature.StatisticManager import StatisticManager
+from temperature.Facebook import Facebook
 import logging
 
 def index(request, sensor = "out"):
@@ -116,3 +120,44 @@ def indicators(request, sensor, type):
     context = Context({ 'table': indicators })
     template = loader.get_template('indicators_chart.html')
     return HttpResponse(template.render(context))
+
+def publish(request):
+    
+    sensor = 'out'
+    type = 'daily'
+
+    max_value = 0
+    min_value = 1000
+    sum_value = 0
+    cnt_value = 0
+
+    q = db.Query(Statistic)
+    q.filter('day >', date.today()-timedelta(6)).filter('sensor = ',sensor).filter('type = ',type).filter('k = ','min_temp').order('day')
+    for stat in q.run():
+        if(stat.v < min_value):
+            min_value = stat.v
+
+    q = db.Query(Statistic)
+    q.filter('day >', date.today()-timedelta(6)).filter('sensor = ',sensor).filter('type = ',type).filter('k = ','max_temp').order('day')
+    for stat in q.run():
+        if(stat.v > max_value):
+            max_value = stat.v
+
+    q = db.Query(Statistic)
+    q.filter('day >', date.today()-timedelta(6)).filter('sensor = ',sensor).filter('type = ',type).filter('k = ','avg_temp').order('day')
+    for stat in q.run():
+        cnt_value = cnt_value + 1
+        sum_value = sum_value + stat.v
+    avg_value = round(sum_value/cnt_value,2)
+    rng_value = max_value - min_value
+
+    message_template = "Last week temperatures:\n* min: {} C\n* max: {} C\n* avg: {} C\n* max - min: {} C\n\n http://arduinothermometer.appspot.com/"
+    message = message_template.format(min_value,max_value,avg_value,rng_value)
+
+    facebook = Facebook()
+    result = facebook.postToFacebook(message)
+    logging.info(result)
+    return HttpResponse('OK', status=200)
+
+
+

@@ -11,3 +11,7 @@ cron:
 - description: monthly min max and avg computation for outside temp
   url: /stats/out/monthly/
   schedule: 1 of month 05:03
+- description: posts to facebook last week resumee
+  url: /publish/
+  schedule: every monday 19:00
+  timezone: Europe/Rome

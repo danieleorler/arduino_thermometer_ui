@@ -1,3 +1,5 @@
+var CHART_HEIGHT = {'xs' : 200, 'sm' : 250, 'md' : 300, 'lg' : 400};
+
 function getDeviceMode()
 {
     var envs = ['xs', 'sm', 'md', 'lg'];
@@ -12,31 +14,9 @@ function getDeviceMode()
         if ($el.is(':hidden'))
         {
             $el.remove();
-            return env
+            return env;
         }
     }
-}
-
-function drawDesktopChart(element,data)
-{
-    google.load('visualization', '1', {'packages':['annotatedtimeline']});
-
-    function drawChart()
-    {
-        var graphData = new google.visualization.DataTable();
-        graphData.addColumn(data.dateType, data.dateName);
-        graphData.addColumn(data.valType, data.valName);
-        
-        for(i in data.series)
-        {
-            graphData.addRows(data.series[i]);
-        }
-
-        var chart = new google.visualization.AnnotatedTimeLine(element);
-        chart.draw(graphData, {displayAnnotations: true, height:data.height});
-    }
-
-    google.setOnLoadCallback(drawChart);
 }
 
 function drawMobileChart(element,data)
@@ -56,7 +36,7 @@ function drawMobileChart(element,data)
         }
 
         var chart = new google.visualization.LineChart(element);
-        chart.draw(graphData, {curveType: "function",height:data.height});
+        chart.draw(graphData, {curveType : "function", height : data.height});
     }
 
     google.setOnLoadCallback(drawChart);
@@ -89,7 +69,8 @@ function drawIndicatorsChart(element,data)
         
         var options =
         {
-            title: 'Min, Max and Avg Temperature'
+            title : 'Min, Max and Avg Temperature',
+            height: data.height
         };
 
 
